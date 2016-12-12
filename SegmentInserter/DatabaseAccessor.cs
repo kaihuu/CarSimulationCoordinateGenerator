@@ -11,11 +11,11 @@ namespace SegmentInserter
 {
     class DatabaseAccessor
     {
-        
+        private static readonly string cn = @"Data Source=ECOLOGDB;Initial Catalog=ECOLOGDBver3;Integrated Security=True";//接続DB
         public static DataTable LinkTableGetter2(int id)
         {
 
-            string cn = @"Data Source=ECOLOGDB;Initial Catalog=ECOLOGDBver2;Integrated Security=True";//接続DB
+            
 
             DataTable dt = new DataTable();
 
@@ -55,7 +55,7 @@ namespace SegmentInserter
         }
         public static void InsertSegment(List<SegmentData> result)
         {
-            string cn = @"Data Source=ECOLOGDB;Initial Catalog=ECOLOGDBver2;Integrated Security=True";//接続DB
+
 
             String insertString;
             for (int i = 0; i < result.Count; i++) {
@@ -87,7 +87,7 @@ namespace SegmentInserter
         }
         public static void InsertLinkList(List<LinkListData> result)
         {
-            string cn = @"Data Source=ECOLOGDB;Initial Catalog=ECOLOGDBver2;Integrated Security=True";//接続DB
+
 
             String insertString;
             for (int i = 0; i < result.Count; i++)
