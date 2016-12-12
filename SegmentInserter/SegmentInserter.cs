@@ -21,9 +21,31 @@ namespace SegmentInserter
         {
             List<SegmentData> resultSegment = new List<SegmentData>();
             List<LinkListData> resultLinkList = new List<LinkListData>();
-            int id = 225; //通勤ルートのセマンティックリンクID
-            //int startNum = 192180;//復路開始地点のリンクNUM
-            int startNum = 1591573;//往路開始地点のリンクNUM
+            int id = 0; //通勤ルートのセマンティックリンクID
+            if(SemanticLink.SelectedIndex == 0)
+            {
+                id = 220;
+            }
+            else if(SemanticLink.SelectedIndex == 1)
+            {
+                id = 221;
+            }
+            else if(SemanticLink.SelectedIndex == 2)
+            {
+                id = 224;
+            }
+            else if (SemanticLink.SelectedIndex == 3)
+            {
+                id = 225;
+            }
+            int startNum = 0;
+            if (Direction.SelectedIndex == 1)//復路が選択されている場合
+            {
+                startNum = 192180;//復路開始地点のリンクNUM
+            }
+            else if(Direction.SelectedIndex == 0){
+                startNum = 1591573;//往路開始地点のリンクNUM
+            }
             DataTable LinkTable = DatabaseAccessor.LinkTableGetter2(id);
             DataRow[] LinkRows = LinkTable.Select(null, "NUM");
             DataRow[] StartLink = LinkTable.Select("NUM = "+ startNum);
