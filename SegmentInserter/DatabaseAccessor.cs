@@ -11,7 +11,7 @@ namespace SegmentInserter
 {
     class DatabaseAccessor
     {
-        private static readonly string cn = @"Data Source=ECOLOGDB;Initial Catalog=ECOLOGDBver3;Integrated Security=True";//接続DB
+        private static readonly string cn = @"Data Source=ECOLOGDB2016;Initial Catalog=ECOLOGDBver3;Integrated Security=True";//接続DB
         public static DataTable LinkTableGetter2(int id)
         {
 
@@ -120,14 +120,14 @@ namespace SegmentInserter
         }
         public static string makeQuerySegmentData(SegmentData data)
         {
-            string query = "INSERT INTO [100M_SEGMENT] VALUES ('" + data.SEGMENT_ID + "','" + data.SEMANTIC_LINK_ID + "','" + data.START_LINK_ID + "','";
-            query += data.START_NUM + "','" + data.START_POINT_OFFSET + "')";
+            string query = "INSERT INTO [1M_SEGMENT] VALUES ('" + data.SEGMENT_ID + "','" + data.SEMANTIC_LINK_ID + "','" + data.START_LINK_ID + "','";
+            query += data.START_NUM + "','" + data.START_POINT_OFFSET + "','" + data.ALTITUDE +  "')";
 
             return query;
         }
         public static string makeQueryLinkList(LinkListData data)
         {
-            string query = "INSERT INTO LINK_LIST VALUES ('" + data.SEGMENT_ID + "','" + data.SEMANTIC_LINK_ID + "','" + data.LINK_NUMBER + "','";
+            string query = "INSERT INTO [LINK_LIST_1M] VALUES ('" + data.SEGMENT_ID + "','" + data.SEMANTIC_LINK_ID + "','" + data.LINK_NUMBER + "','";
             query += data.LINK_ID + "')";
 
             return query;

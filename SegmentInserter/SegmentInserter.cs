@@ -54,6 +54,7 @@ namespace SegmentInserter
             linkList.Add(new LinkData(Convert.ToString(StartLink[0]["LINK_ID"]), Convert.ToInt32(StartLink[0]["NUM"]),
                 Convert.ToDouble(StartLink[0]["START_LAT"]), Convert.ToDouble(StartLink[0]["START_LONG"]),
                 Convert.ToDouble(StartLink[0]["END_LAT"]), Convert.ToDouble(StartLink[0]["END_LONG"]), Convert.ToDouble(StartLink[0]["DISTANCE"])));
+            
             //スタート地点のリンクを初期値に設定
 
             Boolean flag = true;
@@ -78,17 +79,29 @@ namespace SegmentInserter
                 }
 
             }
-            resultSegment = makeSegmentData(linkList,id);
+
+
+            //標高を求める
+            var altitude = getAltitude(linkList); 
+
+            resultSegment = makeSegmentData(linkList,id, altitude);
             resultLinkList = makeLinkListData(linkList, id);
             DatabaseAccessor.InsertSegment(resultSegment);
             DatabaseAccessor.InsertLinkList(resultLinkList);
             StateLabel.Text = Convert.ToString(linkList.Count);
             StateLabel.Update();
         }
-        private List<SegmentData> makeSegmentData(List<LinkData> linkList, int semanticLinkID)
+        private List<double> getAltitude(List<LinkData> linkList)
+        {
+            //座標から標高を求める処理
+
+            return new List<double>();
+        }
+
+        private List<SegmentData> makeSegmentData(List<LinkData> linkList, int semanticLinkID, List<double> altitude)
         {
             List<SegmentData> result = new List<SegmentData>();
-            double length = 100;//セグメント長さ
+            double length = 1;//セグメント長さ
             double templength = length;
             double rest = linkList[0].DISTANCE;
             int segmentID = 1;
@@ -106,7 +119,7 @@ namespace SegmentInserter
                     nextOffset += templength;
                     rest = rest - templength;
                     templength = length;
-                    result.Add(new SegmentData(segmentID, semanticLinkID, startLinkID, startNum, startPointOffset));
+                    result.Add(new SegmentData(segmentID, semanticLinkID, startLinkID, startNum, startPointOffset, altitude[j]));
                     segmentID++;
                     startLinkID = linkList[j].LINK_ID;
                     startNum = linkList[j].NUM;
@@ -117,7 +130,7 @@ namespace SegmentInserter
                     nextOffset = templength;
                         rest = rest - templength;
                         templength = length;
-                        result.Add(new SegmentData(segmentID, semanticLinkID, startLinkID, startNum, startPointOffset));
+                        result.Add(new SegmentData(segmentID, semanticLinkID, startLinkID, startNum, startPointOffset, altitude[j]));
                         segmentID++;
                         startLinkID = linkList[j].LINK_ID;
                         startNum = linkList[j].NUM;
@@ -130,7 +143,7 @@ namespace SegmentInserter
                         rest = rest - templength;
                         templength = length;
 
-                    result.Add(new SegmentData(segmentID, semanticLinkID, startLinkID, startNum, startPointOffset));
+                    result.Add(new SegmentData(segmentID, semanticLinkID, startLinkID, startNum, startPointOffset, altitude[j]));
                         segmentID++;
                         j++;
                         startLinkID = linkList[j].LINK_ID;
@@ -144,7 +157,7 @@ namespace SegmentInserter
                         j++;
                     if (j >= linkList.Count)
                     {
-                        result.Add(new SegmentData(segmentID, semanticLinkID, startLinkID, startNum, startPointOffset));
+                        result.Add(new SegmentData(segmentID, semanticLinkID, startLinkID, startNum, startPointOffset, altitude[j]));
                         break;
                     }
                     rest = linkList[j].DISTANCE;
@@ -163,7 +176,7 @@ namespace SegmentInserter
         private List<LinkListData> makeLinkListData(List<LinkData> linkList, int semanticLinkID)
         {
             List<LinkListData> result = new List<LinkListData>();
-            double length = 100;//セグメント長さ
+            double length = 1;//セグメント長さ
             double templength = length;
             double rest = linkList[0].DISTANCE;
             int segmentID = 1;
@@ -275,13 +288,16 @@ namespace SegmentInserter
         public int START_NUM { get; set; }
         public double START_POINT_OFFSET { get; set; }
 
-        public SegmentData(int SEGMENT_ID, int SEMANTIC_LINK_ID, string START_LINK_ID, int START_NUM, double START_POINT_OFFSET)
+        public double ALTITUDE { get; set; }
+
+        public SegmentData(int SEGMENT_ID, int SEMANTIC_LINK_ID, string START_LINK_ID, int START_NUM, double START_POINT_OFFSET, double ALTITUDE)
         {
             this.SEGMENT_ID = SEGMENT_ID;
             this.SEMANTIC_LINK_ID = SEMANTIC_LINK_ID;
             this.START_LINK_ID = START_LINK_ID;
             this.START_NUM = START_NUM;
             this.START_POINT_OFFSET = START_POINT_OFFSET;
+            this.ALTITUDE = ALTITUDE;
         }
     }
     class LinkListData
