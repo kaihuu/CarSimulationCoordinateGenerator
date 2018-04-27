@@ -99,7 +99,7 @@ namespace SegmentInserter
 
 
 
-
+            #region ここは多分消していい
             DataTable RunTable = DatabaseAccessor.RunTableGetter(id, tripid);      //走行データ取得
             List<RunData> runList = new List<RunData>();
 
@@ -114,6 +114,8 @@ namespace SegmentInserter
 
 
             resultrealcarmatching = MatchingCarPosition(linkList, runList);//Link上の実ログデータの位置を算出
+            #endregion
+            //makePositionDataを書き換えれば完了
             resultCarPositionData = makePositionData(linkList,resultrealcarmatching,NumofCar);//シミュレーションデータを生成
             resultCoodinate = makeCoodinateData(linkList, resultCarPositionData);//Link上の位置から座標データに変換
             WriteCsv(resultCoodinate, Convert.ToInt32(textBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text), Convert.ToInt32(textBox6.Text));//CSVに書き出し
@@ -247,11 +249,11 @@ namespace SegmentInserter
             for (int i = 0; i < realcarposi.Count; i++)
             {
                 Console.WriteLine("i = "+i);
-              //  string LinkID = "";
-              //  int tempNUM = realcarposi[i].NUM;
+                //  string LinkID = "";
+                //  int tempNUM = realcarposi[i].NUM;
                 int j = 0;
 
-        //        result.Add(new CarPositionData(realcarposi[i].TRIP_ID, realcarposi[i].JST,0,realcarposi[i].LINK_ID,realcarposi[i].NUM,realcarposi[i].END_POINT_OFFSET));
+                //        result.Add(new CarPositionData(realcarposi[i].TRIP_ID, realcarposi[i].JST,0,realcarposi[i].LINK_ID,realcarposi[i].NUM,realcarposi[i].END_POINT_OFFSET));
 
 
                 for (int k = 0; k < linkList.Count(); k++)
