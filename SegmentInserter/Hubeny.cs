@@ -5,7 +5,7 @@ using System.Device;
 using System.Linq;
 using System.Text;
 
-namespace CarSimulatorCoodinate2
+namespace SegmentInserter
 {
     static class HubenyDistanceCalculator
     {

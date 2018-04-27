@@ -4,7 +4,7 @@ using System.Device.Location;
 using System.Linq;
 using System.Text;
 
-namespace CarSimulatorCoodinate2
+namespace SegmentInserter
 {
 
         static class OrientationAngleCalculator
