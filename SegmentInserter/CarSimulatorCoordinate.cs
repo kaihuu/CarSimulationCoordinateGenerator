@@ -19,9 +19,10 @@ namespace SegmentInserter
         {
             InitializeComponent();
         }
-
+        //StartInsertボタンをクリックすると開始
         private void button1_Click(object sender, EventArgs e)
         {
+            //初期化
             List<SegmentData> resultSegment = new List<SegmentData>();
             List<LinkListData> resultLinkList = new List<LinkListData>();
             List<CoodinateData> resultCoodinate = new List<CoodinateData>();
@@ -31,8 +32,9 @@ namespace SegmentInserter
 
             int id = 0; //通勤ルートのセマンティックリンクID
             int tripid = 0;
-            int NumofCar = 0;
+            int NumofCar = 0;//シミュレーションで生成する車の数
 
+            //フォームのテキストボックスからIDなどを取得
             id = Convert.ToInt32(textBox1.Text);
             tripid = Convert.ToInt32(textBox4.Text);
             NumofCar = Convert.ToInt32(textBox5.Text);
@@ -48,58 +50,43 @@ namespace SegmentInserter
             //startNum = Convert.ToInt32(textBox2.Text);
             //endNum = Convert.ToInt32(textBox3.Text);
 
-            startNum = 45667;
-            endNum = 894822;
+            startNum = 45667;//通勤セマンティックリンクのスタート地点指定
+            endNum = 894822;//通勤セマンティックリンクのエンド地点指定
 
 
-            DataTable LinkTable = DatabaseAccessor.LinkTableGetter2(id);
-      //      Console.Write(LinkTable.Rows.Count);
+            DataTable LinkTable = DatabaseAccessor.LinkTableGetter2(id);//セマンティックリンクIDからセマンティックリンクデータを取得
 
-            DataRow[] LinkRows = LinkTable.Select(null, "DISTANCE");
-            DataRow[] StartLink = LinkTable.Select("NUM = " + startNum);
-            List<LinkData> linkList = new List<LinkData>();
-      //      Console.Write("\nああああ\n\n");
-            // Console.Write(StartLink.ToString());
+            DataRow[] LinkRows = LinkTable.Select(null, "DISTANCE");//LinkTableをカラムDISTANCEでソートしてDataRow配列に変換
+            DataRow[] StartLink = LinkTable.Select("NUM = " + startNum);//通勤セマンティックリンクのスタート地点のリンク構成点データだけ取り出し
+            List<LinkData> linkList = new List<LinkData>();//リンクデータリスト追加
 
             linkList.Add(new LinkData(Convert.ToString(StartLink[0]["LINK_ID"]), Convert.ToInt32(StartLink[0]["NUM"]),
                 Convert.ToDouble(StartLink[0]["START_LAT"]), Convert.ToDouble(StartLink[0]["START_LONG"]),
-                Convert.ToDouble(StartLink[0]["END_LAT"]), Convert.ToDouble(StartLink[0]["END_LONG"]), Convert.ToDouble(StartLink[0]["DISTANCE"])));
-      //      Console.Write("\nいいいい\n\n");
+                Convert.ToDouble(StartLink[0]["END_LAT"]), Convert.ToDouble(StartLink[0]["END_LONG"]), Convert.ToDouble(StartLink[0]["DISTANCE"])));//スタート地点のリンク構成店データをadd
 
-            //Console.Write(LinkRows.Length + "\n");
-            //Console.Write(StartLink.Length + "\n");
-            //Console.Write(linkList.Count + "\n");
-            ////スタート地点のリンクをlinkListの初期値に設定
-
-
-            Boolean flag = true;
-            int j = 0;
+            #region 通勤リンクデータ結合処理
+            Boolean flag = true;//結合できたか否かを判定するフラグ
+            int j = 0;//linkList配列の最後尾を示すindex
             while (flag)
             {
-                flag = false;
-                for (int i = 0; i < LinkRows.Length; i++)
+                flag = false;//Link結合がされなければtrueにならずにループ終了
+                for (int i = 0; i < LinkRows.Length; i++)//LinkRowsから結合可能なLinkを探索
                 {
-
-                    //  Console.Write(LinkRows[i]["LINK_ID"]+" "+ LinkRows[i]["NUM"] + " " + LinkRows[i]["START_LAT"] + " " + LinkRows[i]["START_LONG"] + " " + LinkRows[i]["END_LAT"] + " " + LinkRows[i]["END_LONG"] + " " + LinkRows[i]["DISTANCE"] + " \n" );
                     if ((Convert.ToDouble(LinkRows[i]["START_LAT"]) == linkList[j].END_LAT && Convert.ToDouble(LinkRows[i]["START_LONG"]) == linkList[j].END_LONG)
-                        && (Convert.ToDouble(LinkRows[i]["END_LAT"]) != linkList[j].START_LAT || Convert.ToDouble(LinkRows[i]["END_LONG"]) != linkList[j].START_LONG))
+                        && (Convert.ToDouble(LinkRows[i]["END_LAT"]) != linkList[j].START_LAT || Convert.ToDouble(LinkRows[i]["END_LONG"]) != linkList[j].START_LONG))//linklistの最後尾の値に結合可能なlinkのみを追加する
                     {
-
-                     //   Console.Write(linkList[j].LINK_ID + " " + linkList[j].NUM + " " + linkList[j].START_LAT + " " + linkList[j].START_LONG + " " + linkList[j].END_LAT + " " + linkList[j].END_LONG + " \n");
-                      //  Console.Write(LinkRows[i]["LINK_ID"] + " " + LinkRows[i]["NUM"] + " " + LinkRows[i]["START_LAT"] + " " + LinkRows[i]["START_LONG"] + " " + LinkRows[i]["END_LAT"] + " " + LinkRows[i]["END_LONG"] + " " + LinkRows[i]["DISTANCE"] + " \n");
 
 
                         linkList.Add(new LinkData(Convert.ToString(LinkRows[i]["LINK_ID"]), Convert.ToInt32(LinkRows[i]["NUM"]),
                                                       Convert.ToDouble(LinkRows[i]["START_LAT"]), Convert.ToDouble(LinkRows[i]["START_LONG"]),
-                                                      Convert.ToDouble(LinkRows[i]["END_LAT"]), Convert.ToDouble(LinkRows[i]["END_LONG"]), Convert.ToDouble(LinkRows[i]["DISTANCE"])));
-                        j++;
-                    //    Console.Write(j + " \n");
+                                                      Convert.ToDouble(LinkRows[i]["END_LAT"]), Convert.ToDouble(LinkRows[i]["END_LONG"]), Convert.ToDouble(LinkRows[i]["DISTANCE"])));//該当LinkをLinklistに追加
+                        j++;//linkListにデータが追加されたので最後尾をUpdate
 
 
-                        flag = true;
+                        flag = true;//Link結合されたのでtrueに書き換え
                         StateLabel.Text = Convert.ToString(linkList.Count);
                         StateLabel.Update();
-                        break;
+                        break;//結合が終わったので次のループへ進む
 
                     }
 
@@ -108,39 +95,28 @@ namespace SegmentInserter
                 }
 
             }
-         //   Console.Write(linkList.Count + "\n\n");
+            #endregion
 
 
 
 
             DataTable RunTable = DatabaseAccessor.RunTableGetter(id, tripid);      //走行データ取得
             List<RunData> runList = new List<RunData>();
-      //      Console.Write(RunTable.Rows.Count+"aaaaaaaa\n\n\n\n");
-           DataRow[] RunRows = RunTable.Select(null, "JST");
+
+           DataRow[] RunRows = RunTable.Select(null, "JST");//走行データを時間でソートしてDataRowに変換
             for (int i = 0; i < RunRows.Length; i++)
             {
                 runList.Add(new RunData(Convert.ToInt32(RunRows[i]["TRIP_ID"]),Convert.ToString(RunRows[i]["JST"]), Convert.ToDouble(RunRows[i]["LATITUDE"]),
-                                                       Convert.ToDouble(RunRows[i]["LONGITUDE"])));
-
-              //  Console.Write(i+","+RunRows[i]["TRIP_ID"]+","+RunRows[i]["JST"] + "," + RunRows[i]["LATITUDE"] + "," + RunRows[i]["LONGITUDE"]+"\n");
+                                                       Convert.ToDouble(RunRows[i]["LONGITUDE"])));//DataRow[]をList<RunData>に変換
             }
 
 
 
 
-            resultrealcarmatching = MatchingCarPosition(linkList, runList);
-         //   Console.Write("\nおおおお");
-            resultCarPositionData = makePositionData(linkList,resultrealcarmatching,NumofCar);
-         //   Console.Write("\nおおおお");
-            resultCoodinate = makeCoodinateData(linkList, resultCarPositionData);
-            WriteCsv(resultCoodinate, Convert.ToInt32(textBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text), Convert.ToInt32(textBox6.Text));
-        //  WriteCsv(resultCoodinate, 298, 11, 10, 40);
-
-
-            //   DatabaseAccessor.InsertLinkList(resultLinkList);
-            //   StateLabel.Text = Convert.ToString(linkList.Count);
-            //   StateLabel.Update();
-        //    Console.Write("\nおおおお");
+            resultrealcarmatching = MatchingCarPosition(linkList, runList);//Link上の実ログデータの位置を算出
+            resultCarPositionData = makePositionData(linkList,resultrealcarmatching,NumofCar);//シミュレーションデータを生成
+            resultCoodinate = makeCoodinateData(linkList, resultCarPositionData);//Link上の位置から座標データに変換
+            WriteCsv(resultCoodinate, Convert.ToInt32(textBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text), Convert.ToInt32(textBox6.Text));//CSVに書き出し
 
         }
 
@@ -225,7 +201,6 @@ namespace SegmentInserter
                     double tempDist = Vector2D.distance(GPSPoint, matchedPoint);
 
 
-             //       Console.Write(k + " " + linkList[i].NUM + " " + tempDist + " " + "\n");
 
 
                     //リンク集合の中での距離最小を探す
@@ -382,7 +357,7 @@ namespace SegmentInserter
                     {
                         Console.WriteLine("3");               //   ③リンクの残り長さが車間距離より短い
 
-                temp_v_distance = temp_v_distance - rest;
+                        temp_v_distance = temp_v_distance - rest;
                         j--;
                         if (j < 0) {
                             break;
