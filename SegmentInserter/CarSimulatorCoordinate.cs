@@ -115,9 +115,11 @@ namespace SegmentInserter
 
             resultrealcarmatching = MatchingCarPosition(linkList, runList);//Link上の実ログデータの位置を算出
             #endregion
+
             //makePositionDataを書き換えれば完了
             resultCarPositionData = makePositionData(linkList,resultrealcarmatching,NumofCar);//シミュレーションデータを生成
-            resultCoodinate = makeCoodinateData(linkList, resultCarPositionData);//Link上の位置から座標データに変換
+
+			resultCoodinate = makeCoodinateData(linkList, resultCarPositionData);//Link上の位置から座標データに変換
             WriteCsv(resultCoodinate, Convert.ToInt32(textBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text), Convert.ToInt32(textBox6.Text));//CSVに書き出し
 
         }
@@ -281,7 +283,7 @@ namespace SegmentInserter
                 do
                 {
 
-                    if (rest > v_distance && temp_v_distance == v_distance)    //①リンクの残り長さが車間距離より大きい＆その車についての最初
+                    if (rest > v_distance && temp_v_distance == v_distance)    //①リンクの残り長さrest＞一秒間の走行距離v_distance＆まだリンクを跨いでいない
 
                     {
                         nextstartPointOffset += temp_v_distance;
@@ -301,7 +303,7 @@ namespace SegmentInserter
 
                     }
 
-                    else if (rest > temp_v_distance)           //②リンクの残り長さが車間距離より大きい&その車両について2回目以降
+                    else if (rest > temp_v_distance)           //②リンクの残り長さ＞残距離&その車両について2回目以降
                     {
 
                         nextstartPointOffset = temp_v_distance;
@@ -326,12 +328,12 @@ namespace SegmentInserter
 
                     }
 
-                    else if (rest == temp_v_distance)　　　　　 //③リンクの残り長さが車間距離と同じ
+                    else if (rest == temp_v_distance)　　　　　 //③リンクの残り長さが車間距離と同じ　＝
                     {
 
 
 
-                        j--;
+                        j++;
                         rest = linkList[j].DISTANCE;
                         temp_v_distance = v_distance;
 
@@ -357,14 +359,11 @@ namespace SegmentInserter
                     }
                     else
                     {
-                        Console.WriteLine("3");               //   ③リンクの残り長さが車間距離より短い
+                        Console.WriteLine("3");               //   ④リンクの残り長さ＜車間距離
 
                         temp_v_distance = temp_v_distance - rest;
-                        j--;
-                        if (j < 0) {
-                            break;
+                        j++;
 
-                        }
                         rest = linkList[j].DISTANCE;
 
 
