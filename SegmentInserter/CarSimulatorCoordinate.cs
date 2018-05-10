@@ -31,17 +31,18 @@ namespace SegmentInserter
 
 
             int id = 0; //通勤ルートのセマンティックリンクID
-            int tripid = 0;
+            //int tripid = 0;
             int NumofCar = 0;//シミュレーションで生成する車の数
+			int carspeed = 60;//車の速度
 
             //フォームのテキストボックスからIDなどを取得
-            id = Convert.ToInt32(textBox1.Text);
-            tripid = Convert.ToInt32(textBox4.Text);
-            NumofCar = Convert.ToInt32(textBox5.Text);
+            //id = Convert.ToInt32(textBox1.Text);
+            //tripid = Convert.ToInt32(textBox4.Text);
+            //NumofCar = Convert.ToInt32(textBox5.Text);
 
-            //id = 298;
+            id = 298;
             //tripid = 11;
-            //NumofCar = 10;
+            NumofCar = 10;
 
 
             int startNum = 0;
@@ -62,7 +63,7 @@ namespace SegmentInserter
 
             linkList.Add(new LinkData(Convert.ToString(StartLink[0]["LINK_ID"]), Convert.ToInt32(StartLink[0]["NUM"]),
                 Convert.ToDouble(StartLink[0]["START_LAT"]), Convert.ToDouble(StartLink[0]["START_LONG"]),
-                Convert.ToDouble(StartLink[0]["END_LAT"]), Convert.ToDouble(StartLink[0]["END_LONG"]), Convert.ToDouble(StartLink[0]["DISTANCE"])));//スタート地点のリンク構成店データをadd
+                Convert.ToDouble(StartLink[0]["END_LAT"]), Convert.ToDouble(StartLink[0]["END_LONG"]), Convert.ToDouble(StartLink[0]["DISTANCE"])));//スタート地点のリンク構成点データをadd
 
             #region 通勤リンクデータ結合処理
             Boolean flag = true;//結合できたか否かを判定するフラグ
@@ -99,28 +100,28 @@ namespace SegmentInserter
 
 
 
-            #region ここは多分消していい
-            DataTable RunTable = DatabaseAccessor.RunTableGetter(id, tripid);      //走行データ取得
-            List<RunData> runList = new List<RunData>();
+           // #region ここは多分消していい
+            //DataTable RunTable = DatabaseAccessor.RunTableGetter(id, tripid);      //走行データ取得
+            //List<RunData> runList = new List<RunData>();
 
-           DataRow[] RunRows = RunTable.Select(null, "JST");//走行データを時間でソートしてDataRowに変換
-            for (int i = 0; i < RunRows.Length; i++)
-            {
-                runList.Add(new RunData(Convert.ToInt32(RunRows[i]["TRIP_ID"]),Convert.ToString(RunRows[i]["JST"]), Convert.ToDouble(RunRows[i]["LATITUDE"]),
-                                                       Convert.ToDouble(RunRows[i]["LONGITUDE"])));//DataRow[]をList<RunData>に変換
-            }
-
-
+           //DataRow[] RunRows = RunTable.Select(null, "JST");//走行データを時間でソートしてDataRowに変換
+           // for (int i = 0; i < RunRows.Length; i++)
+            //{
+            //    runList.Add(new RunData(Convert.ToInt32(RunRows[i]["TRIP_ID"]),Convert.ToString(RunRows[i]["JST"]), Convert.ToDouble(RunRows[i]["LATITUDE"]),
+           //                                            Convert.ToDouble(RunRows[i]["LONGITUDE"])));//DataRow[]をList<RunData>に変換
+           // }
 
 
-            resultrealcarmatching = MatchingCarPosition(linkList, runList);//Link上の実ログデータの位置を算出
-            #endregion
+
+
+           // resultrealcarmatching = MatchingCarPosition(linkList, runList);//Link上の実ログデータの位置を算出
+           // #endregion
 
             //makePositionDataを書き換えれば完了
-            resultCarPositionData = makePositionData(linkList,resultrealcarmatching,NumofCar);//シミュレーションデータを生成
+            //resultCarPositionData = makePositionData(linkList,resultrealcarmatching,NumofCar);//シミュレーションデータを生成
 
-			resultCoodinate = makeCoodinateData(linkList, resultCarPositionData);//Link上の位置から座標データに変換
-            WriteCsv(resultCoodinate, Convert.ToInt32(textBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text), Convert.ToInt32(textBox6.Text));//CSVに書き出し
+			//resultCoodinate = makeCoodinateData(linkList, resultCarPositionData);//Link上の位置から座標データに変換
+            //WriteCsv(resultCoodinate, Convert.ToInt32(textBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text), Convert.ToInt32(textBox6.Text));//CSVに書き出し
 
         }
 
