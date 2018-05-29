@@ -122,8 +122,8 @@ namespace SegmentInserter
 			resultCarPositionData = virtualcarPositionData(linkList);//シミュレーションデータを生成
 
 			//resultCoodinate = makeCoodinateData(linkList, resultCarPositionData);//Link上の位置から座標データに変換
-			WriteCsv(resultCoodinate, Convert.ToInt32(textBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text), Convert.ToInt32(textBox6.Text));//CSVに書き出し
-
+			//WriteCsv(resultCoodinate, Convert.ToInt32(textBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text), Convert.ToInt32(textBox6.Text));//CSVに書き出し
+			CsvWriter(resultCarPositionData);
 
 
 
@@ -175,6 +175,28 @@ namespace SegmentInserter
 
 
 			}
+		}
+
+		private static void CsvWriter(List<VirtualCarPositionData> virtualCarPositionDataList)
+		{
+			int datacount;
+			int index = 0;
+			datacount = virtualCarPositionDataList.Count;
+			for (index = 0; index < datacount; index++) {
+				VirtualCarPositionData virtualCarPositionData;
+				double lat2;
+				double long2;
+				int num2;
+				virtualCarPositionData = virtualCarPositionDataList[index];
+				lat2 = virtualCarPositionData.LATITUDE;
+				long2 = virtualCarPositionData.LONGITUDE;
+				num2 = virtualCarPositionData.NUM;
+				Console.WriteLine(lat2 + "," + long2 + "," + num2);
+				
+
+			}
+			
+
 		}
 
 
@@ -393,7 +415,7 @@ namespace SegmentInserter
 		{
 			List<VirtualCarPositionData> result = new List<VirtualCarPositionData>();
 			VirtualCarPositionData virtualCarPositionData;
-			int v = 1;
+			double v = 10;
 			double past = 0;
 			double rest = 0;
 			int restcount = 0;
@@ -402,35 +424,37 @@ namespace SegmentInserter
 			int posicount = 0;
 			//位置を作った数
 
-			int count = linkList.Count;
+			int count = 100;
 			double lat1  ;
 			double long1 ;
-			string num;
+			int num;
+			double restv = 0;
 
 
 			//result[0].LATITUDE = linkList[0].START_LAT;
 			//result[0].LONGITUDE = linkList[0].START_LONG;
 			lat1 = linkList[0].START_LAT;
 			long1 = linkList[0].START_LONG;
-			num = linkList[0].LINK_ID;
+			num = linkList[0].NUM;
 
 			virtualCarPositionData = new VirtualCarPositionData(lat1, long1, num);
 			result.Add(virtualCarPositionData);
+			// result.Add(new VirtualCarPositionData(linkList[0].START_LAT, linkList[0].START_LONG, linkList[0].NUM));
 
 
 			#region 一つ目
 
 			if (linkList[0].DISTANCE > v) 
-				//次のリンクに移動しない
+				//次のリンクに移動しない場合
 				{
 				//result[1].LATITUDE = (linkList[0].END_LAT - linkList[0].START_LAT) * v / linkList[0].DISTANCE;
 				//result[1].LONGITUDE = (linkList[0].END_LONG - linkList[0].START_LONG) * v / linkList[0].DISTANCE;
 				lat1 = ((linkList[0].END_LAT - linkList[0].START_LAT) * v / linkList[0].DISTANCE) + linkList[0].START_LAT;
 				long1 = ((linkList[0].END_LONG - linkList[0].START_LONG) * v / linkList[0].DISTANCE)+ linkList[0].START_LONG;
-				num = linkList[0].LINK_ID;
+				num = linkList[0].NUM;
 				past = linkList[0].DISTANCE - v;
 
-				virtualCarPositionData = new VirtualCarPositionData(lat1, long1, linkid);
+				virtualCarPositionData = new VirtualCarPositionData(lat1, long1, num);
 				result.Add(virtualCarPositionData);
 
 
@@ -438,26 +462,25 @@ namespace SegmentInserter
 
 			}
 
-				else
+			else{//次以降のnumに移動する場合
+				rest = v - linkList[restcount].DISTANCE;
+				restcount++;
+				
+				while (rest>linkList[restcount].DISTANCE)
 				{
-					rest = v;
-					int count1 = 0;
-					while (rest < 0)
-					{
 
-						rest = rest - linkList[count1].DISTANCE;
-						count1++;
+					rest = rest - linkList[restcount].DISTANCE;
+					restcount++;
 
-
-					}
+				}
 				//result[1].LATITUDE = (((linkList[count1].END_LAT - linkList[count1].START_LAT) * rest / linkList[count1].DISTANCE) + linkList[count1].START_LAT);
 				//result[1].LONGITUDE = (((linkList[count1].END_LONG - linkList[count1].START_LONG) * rest / linkList[count1].DISTANCE) + linkList[count1].START_LONG);
-				lat1 = (((linkList[count1].END_LAT - linkList[count1].START_LAT) * rest / linkList[count1].DISTANCE) + linkList[count1].START_LAT);
-				long1 = (((linkList[count1].END_LONG - linkList[count1].START_LONG) * rest / linkList[count1].DISTANCE) + linkList[count1].START_LONG);
-				num = linkList[count1].LINK_ID;
-				past = linkList[count1].DISTANCE - rest;
+				lat1 = (((linkList[restcount].END_LAT - linkList[restcount].START_LAT) * rest / linkList[restcount].DISTANCE) + linkList[restcount].START_LAT);
+				long1 = (((linkList[restcount].END_LONG - linkList[restcount].START_LONG) * rest / linkList[restcount].DISTANCE) + linkList[restcount].START_LONG);
+				num = linkList[restcount].NUM;
+				past = linkList[restcount].DISTANCE - rest;
 
-				virtualCarPositionData = new VirtualCarPositionData(lat1, long1, linkid);
+				virtualCarPositionData = new VirtualCarPositionData(lat1, long1, num);
 				result.Add(virtualCarPositionData);
 
 
@@ -467,32 +490,51 @@ namespace SegmentInserter
 
 
 			#region　ループ
-			while (restcount < count)
-					if (linkList[posicount].DISTANCE - past > v)
+			while (restcount < 47)
+			{
+				if (linkList[restcount].DISTANCE - past > v)//次のnumに移動しない
+				{
+					lat1 = (linkList[restcount].END_LAT - linkList[restcount].START_LAT) * (v+past) / linkList[restcount].DISTANCE;
+					long1 = (linkList[restcount].END_LONG - linkList[restcount].START_LONG) * (v+past) / linkList[restcount].DISTANCE;
+					num = linkList[restcount].NUM;
+					past = past + v;
+
+
+					virtualCarPositionData = new VirtualCarPositionData(lat1, long1, num);
+					result.Add(virtualCarPositionData);
+
+					posicount++;
+				}
+				else//次のnumに移動する
+				{
+					
+					rest = linkList[restcount].DISTANCE - past;
+					restv = v - rest;
+					restcount++;
+
+					while (restv > linkList[restcount].DISTANCE)
 					{
-						result[posicount].LATITUDE = (linkList[restcount].END_LAT - linkList[restcount].START_LAT) * v / linkList[restcount].DISTANCE;
-						result[posicount].LONGITUDE = (linkList[restcount].END_LONG - linkList[restcount].START_LONG) * v / linkList[restcount].DISTANCE;
-						past = past + v;
-						posicount++;
+						restv = restv - linkList[restcount].DISTANCE;
+						restcount++;
+						
 					}
-					else
-					{
-						rest = linkList[restcount].DISTANCE - past;
-						while (rest < linkList[restcount].DISTANCE) {
-							rest = linkList[restcount].DISTANCE - v;
-							restcount++;
+
+					lat1 = (((linkList[restcount].END_LAT - linkList[restcount].START_LAT) * restv / linkList[restcount].DISTANCE) + linkList[restcount].START_LAT);
+					long1 = (((linkList[restcount].END_LONG - linkList[restcount].START_LONG) * restv / linkList[restcount].DISTANCE) + linkList[restcount].START_LONG);
+					num = linkList[restcount].NUM;
+					past = linkList[restcount].DISTANCE - restv;
 
 
-						}
 
-						result[posicount].LATITUDE = (((linkList[restcount].END_LAT - linkList[restcount].START_LAT) * rest / linkList[restcount].DISTANCE) + linkList[restcount].START_LAT);
-						result[posicount].LONGITUDE = (((linkList[restcount].END_LONG - linkList[restcount].START_LONG) * rest / linkList[restcount].DISTANCE) + linkList[restcount].START_LONG);
-						past = linkList[restcount].DISTANCE - rest;
+					virtualCarPositionData = new VirtualCarPositionData(lat1, long1, num);
+					result.Add(virtualCarPositionData);
 
-						posicount++;
+					posicount++;
 
 
-					}
+				}
+			}
+			
 
 			#endregion
 
@@ -719,17 +761,15 @@ namespace SegmentInserter
 
 		public double LATITUDE { get; set; }
 		public double LONGITUDE { get; set; }
-		public string LINK_ID { get; set; }
 		public int NUM { get; set; }
 
 
 
-		public VirtualCarPositionData(double LATITUDE, double LONGITUDE, string LINK_ID, int NUM)
+		public VirtualCarPositionData(double LATITUDE, double LONGITUDE, int NUM)
 		{
 
 			this.LATITUDE = LATITUDE;
 			this.LONGITUDE = LONGITUDE;
-			this.LINK_ID = LINK_ID;
 			this.NUM = NUM;
 
 
