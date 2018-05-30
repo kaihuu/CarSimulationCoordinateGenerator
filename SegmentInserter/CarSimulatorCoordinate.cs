@@ -49,11 +49,11 @@ namespace SegmentInserter
 			int startNum = 0;
 			int endNum = 0;
 
-			//startNum = Convert.ToInt32(textBox2.Text);
-			//endNum = Convert.ToInt32(textBox3.Text);
+			startNum = Convert.ToInt32(textBox2.Text);
+			endNum = Convert.ToInt32(textBox3.Text);
 
-			startNum = 45668;//通勤セマンティックリンクのスタート地点指定
-			endNum = 894847;//通勤セマンティックリンクのエンド地点指定
+			//startNum = 45668;//通勤セマンティックリンクのスタート地点指定
+			//endNum = 894847;//通勤セマンティックリンクのエンド地点指定
 			#endregion
 
 			DataTable LinkTable = DatabaseAccessor.LinkTableGetter2(id);//セマンティックリンクIDからセマンティックリンクデータを取得
@@ -177,28 +177,32 @@ namespace SegmentInserter
 			}
 		}
 
+		#region 新規csv出力メソッド
 		private static void CsvWriter(List<VirtualCarPositionData> virtualCarPositionDataList)
 		{
 			int datacount;
 			int index = 0;
 			datacount = virtualCarPositionDataList.Count;
+			DateTime dtBirth = DateTime.Now;
 			for (index = 0; index < datacount; index++) {
 				VirtualCarPositionData virtualCarPositionData;
 				double lat2;
 				double long2;
 				int num2;
+				
 				virtualCarPositionData = virtualCarPositionDataList[index];
 				lat2 = virtualCarPositionData.LATITUDE;
 				long2 = virtualCarPositionData.LONGITUDE;
 				num2 = virtualCarPositionData.NUM;
-				Console.WriteLine(lat2 + "," + long2 + "," + num2);
+				Console.WriteLine(dtBirth.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "," + dtBirth.ToString("yyyy-MM-dd HH:mm:ss.FFF" )+ "," + lat2 + "," + long2 + "," + num2);
+				dtBirth = dtBirth.AddSeconds(1);
 				
 
 			}
 			
 
 		}
-
+		#endregion
 
 
 
@@ -410,12 +414,13 @@ namespace SegmentInserter
 			}
 			return result;
 		}
-
+		#region　新規生成メソッド
 		private List<VirtualCarPositionData> virtualcarPositionData(List<LinkData> linkList)
 		{
 			List<VirtualCarPositionData> result = new List<VirtualCarPositionData>();
 			VirtualCarPositionData virtualCarPositionData;
-			double v = 10;
+			double v = Convert.ToInt32(textBox4.Text);
+			v = v * 1000 / 3600;
 			double past = 0;
 			double rest = 0;
 			int restcount = 0;
@@ -490,7 +495,7 @@ namespace SegmentInserter
 
 
 			#region　ループ
-			while (restcount < 47)
+			while (restcount < (linkList.Count - 1))
 			{
 				if (linkList[restcount].DISTANCE - past > v)//次のnumに移動しない
 				{
@@ -543,7 +548,7 @@ namespace SegmentInserter
 
 
 
-
+			#endregion
 
 
 
