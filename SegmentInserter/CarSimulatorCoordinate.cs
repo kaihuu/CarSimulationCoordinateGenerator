@@ -52,6 +52,7 @@ namespace SegmentInserter
 			startNum = Convert.ToInt32(textBox2.Text);
 			endNum = Convert.ToInt32(textBox3.Text);
 
+
 			//startNum = 45668;//通勤セマンティックリンクのスタート地点指定
 			//endNum = 894847;//通勤セマンティックリンクのエンド地点指定
 			#endregion
@@ -135,47 +136,47 @@ namespace SegmentInserter
 
 
 
-		private static void WriteCsv(List<CoodinateData> resultcoordinate, int semantici_id, int trip_id, int num, int distance)
-		{
+		//private static void WriteCsv(List<CoodinateData> resultcoordinate, int semantici_id, int trip_id, int num, int distance)
+		//{
 
-			for (int j = 0; j < num; j++)
-			{
-				List<CoodinateData> insertcoordinate = new List<CoodinateData>();
-				for (int k = 0; k < resultcoordinate.Count; k++)
-				{
-					if (resultcoordinate[k].CAR_NUM == j)
-					{
-						insertcoordinate.Add(resultcoordinate[k]);
-						Console.WriteLine(resultcoordinate[k].LATITUDE + "  " + resultcoordinate[k].JST);
-					}
-				}
+		//	for (int j = 0; j < num; j++)
+		//	{
+		//		List<CoodinateData> insertcoordinate = new List<CoodinateData>();
+		//		for (int k = 0; k < resultcoordinate.Count; k++)
+		//		{
+		//			if (resultcoordinate[k].CAR_NUM == j)
+		//			{
+		//				insertcoordinate.Add(resultcoordinate[k]);
+		//				Console.WriteLine(resultcoordinate[k].LATITUDE + "  " + resultcoordinate[k].JST);
+		//			}
+		//		}
 
-				try
-				{
-					// appendをtrueにすると，既存のファイルに追記
-					//         falseにすると，ファイルを新規作成する
-					var append = false;
-					// 出力用のファイルを開く
-					using (var sw = new System.IO.StreamWriter(@"C: \Users\arinaga\Documents\GitHub\CarSimulationCoordinateGenerator\" + "sim_" + semantici_id + "_" + trip_id + "_" + num + "_" + distance + "M" + j + ".csv", append))
-					{
-						for (int i = 0; i < insertcoordinate.Count; ++i)
+		//		try
+		//		{
+		//			// appendをtrueにすると，既存のファイルに追記
+		//			//         falseにすると，ファイルを新規作成する
+		//			var append = false;
+		//			// 出力用のファイルを開く
+		//			using (var sw = new System.IO.StreamWriter(@"C: \Users\arinaga\Documents\GitHub\CarSimulationCoordinateGenerator\" + "sim_" + semantici_id + "_" + trip_id + "_" + num + "_" + distance + "M" + j + ".csv", append))
+		//			{
+		//				for (int i = 0; i < insertcoordinate.Count; ++i)
 
-						{
+		//				{
 
-							DateTime dt1 = DateTime.Parse(insertcoordinate[i].JST);
-							sw.WriteLine("{0},{1},{2},{3}", dt1.ToString("yyyy-MM-dd HH:mm:ss.FFF"),/*dt1.Year + "-" + dt1.Month + "-" + dt1.Day+ " " +dt1.TimeOfDay*/dt1.ToString("yyyy-MM-dd HH:mm:ss.FFF"), insertcoordinate[i].LATITUDE, insertcoordinate[i].LONGITUDE);
-						}
-					}
-				}
-				catch (System.Exception e)
-				{
-					// ファイルを開くのに失敗したときエラーメッセージを表示
-					System.Console.WriteLine(e.Message);
-				}
+		//					DateTime dt1 = DateTime.Parse(insertcoordinate[i].JST);
+		//					sw.WriteLine("{0},{1},{2},{3}", dt1.ToString("yyyy-MM-dd HH:mm:ss.FFF"),/*dt1.Year + "-" + dt1.Month + "-" + dt1.Day+ " " +dt1.TimeOfDay*/dt1.ToString("yyyy-MM-dd HH:mm:ss.FFF"), insertcoordinate[i].LATITUDE, insertcoordinate[i].LONGITUDE);
+		//				}
+		//			}
+		//		}
+		//		catch (System.Exception e)
+		//		{
+		//			// ファイルを開くのに失敗したときエラーメッセージを表示
+		//			System.Console.WriteLine(e.Message);
+		//		}
 
 
-			}
-		}
+		//	}
+		//}
 
 		#region 新規csv出力メソッド
 		private static void CsvWriter(List<VirtualCarPositionData> virtualCarPositionDataList)
@@ -195,6 +196,23 @@ namespace SegmentInserter
 				long2 = virtualCarPositionData.LONGITUDE;
 				num2 = virtualCarPositionData.NUM;
 				Console.WriteLine(dtBirth.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "," + dtBirth.ToString("yyyy-MM-dd HH:mm:ss.FFF" )+ "," + lat2 + "," + long2 + "," + num2);
+				System.IO.StreamWriter sw = new System.IO.StreamWriter(
+					@"C:\Users\arinaga\Desktop\test.csv",
+					true,
+					System.Text.Encoding.GetEncoding("shift_jis"));
+				//int colCount = virtualCarPositionDataList.Count;
+				//int lastColindex = colCount - 1;
+
+				//if (writeHeader)
+				//{
+				//	for (int i = 0; i < colCount; i++)
+				//	{
+				//		string field = virtualCarPositionDataList.
+
+				sw.Write(dtBirth.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "," + dtBirth.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "," + lat2 + "," + long2 + "," + num2 + "\n");
+				sw.Close();
+
+
 				dtBirth = dtBirth.AddSeconds(1);
 				
 
@@ -419,8 +437,9 @@ namespace SegmentInserter
 		{
 			List<VirtualCarPositionData> result = new List<VirtualCarPositionData>();
 			VirtualCarPositionData virtualCarPositionData;
-			double v = Convert.ToInt32(textBox4.Text);
-			v = v * 1000 / 3600;
+			double v3 = Convert.ToInt32(textBox4.Text);
+			double v = 0;
+			v = v3 * 1000 / 3600;
 			double past = 0;
 			double rest = 0;
 			int restcount = 0;
@@ -457,7 +476,7 @@ namespace SegmentInserter
 				lat1 = ((linkList[0].END_LAT - linkList[0].START_LAT) * v / linkList[0].DISTANCE) + linkList[0].START_LAT;
 				long1 = ((linkList[0].END_LONG - linkList[0].START_LONG) * v / linkList[0].DISTANCE)+ linkList[0].START_LONG;
 				num = linkList[0].NUM;
-				past = linkList[0].DISTANCE - v;
+				past =  v;
 
 				virtualCarPositionData = new VirtualCarPositionData(lat1, long1, num);
 				result.Add(virtualCarPositionData);
@@ -499,8 +518,8 @@ namespace SegmentInserter
 			{
 				if (linkList[restcount].DISTANCE - past > v)//次のnumに移動しない
 				{
-					lat1 = (linkList[restcount].END_LAT - linkList[restcount].START_LAT) * (v+past) / linkList[restcount].DISTANCE;
-					long1 = (linkList[restcount].END_LONG - linkList[restcount].START_LONG) * (v+past) / linkList[restcount].DISTANCE;
+					lat1 = (linkList[restcount].END_LAT - linkList[restcount].START_LAT) * (v+past) / linkList[restcount].DISTANCE + linkList[restcount].START_LAT;
+					long1 = (linkList[restcount].END_LONG - linkList[restcount].START_LONG) * (v+past) / linkList[restcount].DISTANCE + linkList[restcount].START_LONG;
 					num = linkList[restcount].NUM;
 					past = past + v;
 
@@ -527,7 +546,7 @@ namespace SegmentInserter
 					lat1 = (((linkList[restcount].END_LAT - linkList[restcount].START_LAT) * restv / linkList[restcount].DISTANCE) + linkList[restcount].START_LAT);
 					long1 = (((linkList[restcount].END_LONG - linkList[restcount].START_LONG) * restv / linkList[restcount].DISTANCE) + linkList[restcount].START_LONG);
 					num = linkList[restcount].NUM;
-					past = linkList[restcount].DISTANCE - restv;
+					past =  restv;
 
 
 
